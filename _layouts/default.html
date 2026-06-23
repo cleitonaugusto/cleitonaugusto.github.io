@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title }} — {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+  <meta name="author" content="{{ site.author }}">
+  <link rel="canonical" href="{{ page.url | absolute_url }}">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
+  <meta property="og:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
+  <meta property="og:type" content="{% if page.layout == 'post' %}article{% else %}website{% endif %}">
+
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a class="site-title" href="{{ '/' | relative_url }}">
+      cleiton<span>.</span>dev
+    </a>
+    <nav>
+      <a href="{{ '/' | relative_url }}">Posts</a>
+      <a href="https://github.com/cleitonaugusto/CleitonQ" target="_blank" rel="noopener">CleitonQ</a>
+      <a href="https://doi.org/10.5281/zenodo.20776349" target="_blank" rel="noopener">Paper</a>
+      <a href="https://github.com/cleitonaugusto" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+{{ content }}
+
+<footer class="site-footer">
+  <div class="inner">
+    <span>Cleiton Augusto Correa Bezerra</span>
+    <span>
+      <a href="https://github.com/cleitonaugusto" target="_blank" rel="noopener">github</a>
+      &nbsp;·&nbsp;
+      <a href="https://crates.io/crates/cleitonq" target="_blank" rel="noopener">crates.io</a>
+      &nbsp;·&nbsp;
+      <a href="https://doi.org/10.5281/zenodo.20776349" target="_blank" rel="noopener">zenodo</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>

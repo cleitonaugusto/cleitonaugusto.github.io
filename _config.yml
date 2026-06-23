@@ -1,0 +1,21 @@
+title: Cleiton Augusto
+description: Security research — post-quantum cryptography, autonomous systems, formal verification
+author: Cleiton Augusto Correa Bezerra
+url: "https://cleitonaugusto.github.io"
+baseurl: ""
+
+permalink: /:year/:month/:day/:title/
+
+markdown: kramdown
+highlighter: rouge
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: highlight
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock

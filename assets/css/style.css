@@ -1,0 +1,294 @@
+:root {
+  --bg:        #0d1117;
+  --bg-card:   #161b22;
+  --border:    #21262d;
+  --text:      #c9d1d9;
+  --text-dim:  #8b949e;
+  --accent:    #58a6ff;
+  --accent-2:  #3fb950;
+  --code-bg:   #161b22;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Layout ───────────────────────────────────────────────── */
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+  padding: 1.25rem 0;
+}
+
+.site-header .inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.site-title span {
+  color: var(--accent-2);
+}
+
+nav a {
+  color: var(--text-dim);
+  font-size: 0.875rem;
+  margin-left: 1.5rem;
+}
+
+nav a:hover { color: var(--text); text-decoration: none; }
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+/* ── Home ─────────────────────────────────────────────────── */
+
+.hero {
+  margin-bottom: 3.5rem;
+}
+
+.hero h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #e6edf3;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+}
+
+.hero p {
+  color: var(--text-dim);
+  font-size: 1rem;
+  max-width: 520px;
+}
+
+.hero .tags {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--accent-2);
+  background: rgba(63, 185, 80, 0.1);
+  border: 1px solid rgba(63, 185, 80, 0.2);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2rem;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.post-list { list-style: none; }
+
+.post-list li {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-list li:last-child { border-bottom: none; }
+
+.post-list .post-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e6edf3;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.post-list .post-title:hover { color: var(--accent); text-decoration: none; }
+
+.post-list .post-meta {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.post-list .post-excerpt {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+/* ── Post ─────────────────────────────────────────────────── */
+
+.post-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-header h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #e6edf3;
+  letter-spacing: -0.03em;
+  line-height: 1.3;
+  margin-bottom: 0.75rem;
+}
+
+.post-header .meta {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+}
+
+.post-content h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e6edf3;
+  margin: 2.5rem 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.post-content h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e6edf3;
+  margin: 2rem 0 0.5rem;
+}
+
+.post-content p { margin-bottom: 1.25rem; }
+
+.post-content ul,
+.post-content ol {
+  margin: 0 0 1.25rem 1.5rem;
+}
+
+.post-content li { margin-bottom: 0.35rem; }
+
+.post-content strong { color: #e6edf3; font-weight: 600; }
+
+.post-content em { color: var(--text-dim); }
+
+.post-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+}
+
+.post-content blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 0.5rem 1rem;
+  margin: 1.5rem 0;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ── Code ─────────────────────────────────────────────────── */
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  color: #79c0ff;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #e6edf3;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* Rouge syntax — GitHub dark palette */
+.highlight .k  { color: #ff7b72; }   /* keyword */
+.highlight .kd { color: #ff7b72; }
+.highlight .kn { color: #ff7b72; }
+.highlight .s  { color: #a5d6ff; }   /* string */
+.highlight .s1 { color: #a5d6ff; }
+.highlight .s2 { color: #a5d6ff; }
+.highlight .c  { color: #8b949e; font-style: italic; } /* comment */
+.highlight .c1 { color: #8b949e; font-style: italic; }
+.highlight .n  { color: #e6edf3; }
+.highlight .nf { color: #d2a8ff; }   /* function */
+.highlight .nc { color: #ffa657; }   /* class/type */
+.highlight .mi { color: #79c0ff; }   /* integer */
+.highlight .mf { color: #79c0ff; }
+.highlight .o  { color: #ff7b72; }   /* operator */
+.highlight .p  { color: #e6edf3; }   /* punctuation */
+.highlight .nl { color: #3fb950; }   /* label */
+.highlight .na { color: #79c0ff; }
+
+/* ── Footer ───────────────────────────────────────────────── */
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 0;
+  margin-top: 4rem;
+}
+
+.site-footer .inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.site-footer a { color: var(--text-dim); }
+.site-footer a:hover { color: var(--accent); }
+
+/* ── Responsive ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .site-header .inner { flex-direction: column; gap: 0.75rem; align-items: flex-start; }
+  nav a:first-child { margin-left: 0; }
+  .post-header h1 { font-size: 1.4rem; }
+  .hero h1 { font-size: 1.4rem; }
+  .site-footer .inner { flex-direction: column; gap: 0.5rem; }
+}
