@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is your model real? — Independent validation for ML-in-science</title>
+<style>
+  :root {
+    --ground: #f6f7f9;
+    --raise: #ffffff;
+    --ink: #14181f;
+    --muted: #5b6472;
+    --faint: #828b98;
+    --line: #dde2e9;
+    --accent: #1f3a5f;
+    --accent-soft: #e7edf4;
+    --fail: #b23b32;
+    --fail-soft: #f6e6e4;
+    --pass: #2f7a54;
+    --shadow: 0 1px 2px rgba(20,24,31,.04), 0 8px 30px rgba(20,24,31,.05);
+    --font-display: ui-serif, Georgia, "Iowan Old Style", Cambria, "Times New Roman", serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #0e1116;
+      --raise: #151a21;
+      --ink: #e7ebf0;
+      --muted: #97a1b0;
+      --faint: #6c7683;
+      --line: #232b36;
+      --accent: #83a6d6;
+      --accent-soft: #1a2634;
+      --fail: #e17168;
+      --fail-soft: #2a1a19;
+      --pass: #5cb98a;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 34px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #f6f7f9; --raise: #ffffff; --ink: #14181f; --muted: #5b6472; --faint: #828b98;
+    --line: #dde2e9; --accent: #1f3a5f; --accent-soft: #e7edf4; --fail: #b23b32;
+    --fail-soft: #f6e6e4; --pass: #2f7a54; --shadow: 0 1px 2px rgba(20,24,31,.04), 0 8px 30px rgba(20,24,31,.05);
+  }
+  :root[data-theme="dark"] {
+    --ground: #0e1116; --raise: #151a21; --ink: #e7ebf0; --muted: #97a1b0; --faint: #6c7683;
+    --line: #232b36; --accent: #83a6d6; --accent-soft: #1a2634; --fail: #e17168;
+    --fail-soft: #2a1a19; --pass: #5cb98a; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 34px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px; line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px; }
+  .rule { border: 0; border-top: 1px solid var(--line); margin: 0; }
+
+  /* ── type ── */
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; letter-spacing: -.01em; }
+  h1 { font-size: clamp(2rem, 5.2vw, 3.05rem); line-height: 1.1; margin: 0; }
+  h2 { font-size: clamp(1.5rem, 3.4vw, 2rem); line-height: 1.15; margin: 0 0 .2em; }
+  p { margin: 0 0 1.1em; }
+  .lead { font-size: 1.18rem; color: var(--muted); line-height: 1.6; }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: .74rem; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--faint); margin: 0 0 1.4rem;
+  }
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  strong { font-weight: 650; color: var(--ink); }
+
+  /* ── hero ── */
+  .hero { padding: clamp(4rem, 10vw, 7rem) 0 3rem; }
+  .verdict {
+    margin: 2.6rem 0 2.2rem; padding: 1.6rem 1.8rem;
+    background: var(--raise); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow);
+    display: flex; align-items: baseline; gap: 1.4rem; flex-wrap: wrap;
+  }
+  .verdict .num {
+    font-family: var(--font-mono); font-weight: 600; letter-spacing: -.02em;
+    font-size: clamp(3.2rem, 11vw, 5rem); line-height: .9; color: var(--fail);
+    font-variant-numeric: tabular-nums;
+  }
+  .verdict .cap { color: var(--muted); font-size: 1.05rem; max-width: 22ch; }
+  .verdict .cap b { color: var(--ink); font-weight: 600; }
+
+  /* ── sections ── */
+  section { padding: clamp(3rem, 7vw, 4.6rem) 0; }
+  .kicker {
+    font-family: var(--font-mono); font-size: .72rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 1.1rem; font-weight: 600;
+  }
+
+  .two { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line);
+         border-radius: 14px; overflow: hidden; margin-top: 1.6rem; }
+  @media (min-width: 620px) { .two { grid-template-columns: 1fr 1fr; } }
+  .two .q { background: var(--ground); padding: 1.5rem 1.6rem; }
+  .two .q .n { font-family: var(--font-mono); color: var(--faint); font-size: .8rem; }
+  .two .q h3 { font-size: 1.18rem; margin: .5rem 0 .3rem; }
+  .two .q p { margin: 0; color: var(--muted); font-size: .97rem; }
+
+  .enforce { list-style: none; padding: 0; margin: 1.6rem 0 0; display: grid; gap: 1px;
+             background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .enforce li { background: var(--ground); padding: 1.15rem 1.5rem; display: grid;
+                grid-template-columns: auto 1fr; gap: .3rem 1.1rem; align-items: baseline; }
+  .enforce .t { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em;
+                text-transform: uppercase; color: var(--accent); white-space: nowrap;
+                grid-row: 1; align-self: center; }
+  .enforce .d { grid-column: 2; color: var(--muted); font-size: .97rem; }
+  .enforce .h { grid-column: 2; grid-row: 1; font-weight: 600; }
+
+  /* ── scorecard ── */
+  .card { background: var(--raise); border: 1px solid var(--line); border-radius: 14px;
+          box-shadow: var(--shadow); overflow: hidden; margin-top: 1.6rem; }
+  .card .head { padding: 1rem 1.5rem; border-bottom: 1px solid var(--line);
+                display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+                font-family: var(--font-mono); font-size: .8rem; color: var(--muted); }
+  .card .head .score { color: var(--fail); font-weight: 600; letter-spacing: .02em; }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+  th, td { text-align: left; padding: .85rem 1.5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+  th { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em;
+       text-transform: uppercase; color: var(--faint); font-weight: 600; }
+  td.bench { font-weight: 550; color: var(--ink); white-space: nowrap; }
+  td .why { color: var(--muted); }
+  .stamp { font-family: var(--font-mono); font-size: .7rem; font-weight: 600; letter-spacing: .08em;
+           color: var(--fail); background: var(--fail-soft); border: 1px solid var(--fail);
+           padding: .12rem .5rem; border-radius: 5px; white-space: nowrap; }
+
+  /* ── pull quote ── */
+  .pull { padding: clamp(3.4rem, 8vw, 5.4rem) 0; }
+  .pull blockquote { margin: 0; font-family: var(--font-display); font-weight: 500;
+                     font-size: clamp(1.5rem, 4vw, 2.15rem); line-height: 1.28; text-wrap: balance;
+                     letter-spacing: -.015em; }
+  .pull blockquote .em { color: var(--fail); font-style: italic; }
+
+  /* ── offer ── */
+  .offer { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line);
+           border-radius: 14px; overflow: hidden; margin-top: 1.6rem; }
+  .offer .row { background: var(--ground); padding: 1.4rem 1.6rem; }
+  .offer .row .who { font-family: var(--font-mono); font-size: .72rem; letter-spacing: .12em;
+                     text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .offer .row p { margin: .5rem 0 0; color: var(--muted); font-size: .98rem; }
+  .offer .row p b { color: var(--ink); }
+
+  /* ── cta ── */
+  .cta { text-align: center; padding: clamp(3.6rem, 8vw, 5.6rem) 0 1rem; }
+  .cta h2 { margin-bottom: .8rem; }
+  .cta p { color: var(--muted); max-width: 46ch; margin-inline: auto; }
+  .btns { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; margin-top: 1.8rem; }
+  .btn { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--font-body);
+         font-weight: 600; font-size: .98rem; padding: .8rem 1.4rem; border-radius: 9px;
+         text-decoration: none; transition: transform .12s ease, background .12s ease; }
+  .btn.primary { background: var(--accent); color: var(--ground); }
+  .btn.primary:hover { transform: translateY(-1px); }
+  .btn.ghost { border: 1px solid var(--line); color: var(--ink); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .sign { font-family: var(--font-mono); font-size: .82rem; color: var(--faint);
+          text-align: center; padding: 3rem 0 4.5rem; }
+  .sign a { color: var(--muted); }
+
+  a:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+  .reveal { opacity: 0; transform: translateY(12px); animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+  @media (prefers-reduced-motion: reduce) { .reveal { animation: none; opacity: 1; transform: none; } }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+</style>
+
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="wrap reveal">
+      <p class="eyebrow">Independent validation · ML for science</p>
+      <h1>I built a validation gate for ML&#8209;in&#8209;science. Then I turned it on my own work.</h1>
+      <div class="verdict">
+        <div class="num">0&#8202;/&#8202;5</div>
+        <div class="cap">of <b>my own</b> benchmarks survived a blind holdout against a trivial baseline.</div>
+      </div>
+      <p class="lead">"AI for science" is full of models that <em>look</em> impressive and don't
+      survive scrutiny. A slide shows &rho;&nbsp;=&nbsp;0.85; nobody asks the two questions that
+      matter. When you finally ask them, the number usually evaporates. I know — because it
+      happened to me, and I have the scorecard to prove it.</p>
+    </div>
+  </header>
+
+  <hr class="rule">
+
+  <section>
+    <div class="wrap">
+      <p class="kicker">The two questions nobody asks</p>
+      <h2>Most results die on one of these.</h2>
+      <div class="two">
+        <div class="q">
+          <span class="n">01</span>
+          <h3>Does it beat a trivial baseline?</h3>
+          <p>Molecular weight. A 1963 lookup table. A docking score. If the dumb rule wins,
+          there is no method — the model just recoded the obvious.</p>
+        </div>
+        <div class="q">
+          <span class="n">02</span>
+          <h3>Does it survive a blind holdout?</h3>
+          <p>Tested once, on data it never touched — no lucky seed, no leaky split, no
+          quietly dropping the inconvenient point after you've seen it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="wrap">
+      <p class="kicker">What the gate enforces</p>
+      <h2>It refuses the shortcuts that produce fake claims.</h2>
+      <ul class="enforce">
+        <li><span class="t">Pre-reg</span><span class="h">Pre-registration, hash-sealed</span>
+          <span class="d">Hypothesis and metric declared before results. Change it afterward and the tool detects it and voids the study.</span></li>
+        <li><span class="t">Baseline</span><span class="h">A trivial baseline is mandatory</span>
+          <span class="d">The model has to beat the dumb rule, not the strawman. If the baseline wins, the verdict is fail.</span></li>
+        <li><span class="t">Holdout</span><span class="h">Blind holdout, touched once</span>
+          <span class="d">No best-of-N, no post-hoc exclusion. One split, one shot, one verdict.</span></li>
+        <li><span class="t">Stats</span><span class="h">Honest statistics</span>
+          <span class="d">Bootstrap confidence intervals, and what chance alone would produce at that sample size.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <div class="wrap">
+      <p class="kicker">The self-audit</p>
+      <h2>I ran it on five months of my own results.</h2>
+      <div class="card">
+        <div class="head"><span>Self-audit — computational chemistry</span><span class="score">0 / 5 passed</span></div>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Benchmark</th><th>Verdict</th><th>Why it failed</th></tr></thead>
+            <tbody>
+              <tr><td class="bench">Flagship metal-sensing (&rho;=0.95 claimed)</td><td><span class="stamp">FAIL</span></td><td class="why">A 1963 lookup table beat it — and n was too small to conclude anything.</td></tr>
+              <tr><td class="bench">Selectivity study</td><td><span class="stamp">FAIL</span></td><td class="why">Pre-registered, but no comparable data had ever been collected.</td></tr>
+              <tr><td class="bench">Protein-target model (n=148)</td><td><span class="stamp">FAIL</span></td><td class="why">The signal was molecular weight. The "quantum" method added noise, not information.</td></tr>
+              <tr><td class="bench">Hydroxamate series (n=6)</td><td><span class="stamp">FAIL</span></td><td class="why">Sample too small for any interpretable result.</td></tr>
+              <tr><td class="bench">Multi-target sweep</td><td><span class="stamp">FAIL</span></td><td class="why">Docking and trivial baselines won across the board.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p style="margin-top:1.4rem; color:var(--muted); font-size:.97rem;">Those were the claims I
+      was ready to publish. My own tool killed every one.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <div class="pull">
+    <div class="wrap">
+      <blockquote>Almost everyone builds a tool that <span class="em">confirms</span> their claims.
+      I built one that <span class="em">kills</span> them. A validation tool that has never told
+      its author "no" isn't validation — it's rationalization.</blockquote>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <section>
+    <div class="wrap">
+      <p class="kicker">What I do with it</p>
+      <h2>I tell you whether a model is real — before you bet on it.</h2>
+      <div class="offer">
+        <div class="row"><span class="who">Investors</span>
+          <p>Technical due diligence on an AI-science startup: <b>is the core claim real, or an
+          artifact</b> of a leaky split, a lucky seed, or a strawman baseline?</p></div>
+        <div class="row"><span class="who">Founders</span>
+          <p>Your model <b>is</b> real? An independent validation you can hand your investors —
+          <b>"we passed the rigor gate."</b></p></div>
+        <div class="row"><span class="who">R&amp;D teams</span>
+          <p>Deciding whether to commit wet-lab budget to a model's predictions. <b>Know before
+          you spend.</b></p></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section class="cta">
+    <div class="wrap">
+      <h2>Is your model real?</h2>
+      <p>One model, one honest verdict: it beats the trivial baseline in a blind holdout, or it
+      doesn't. If it's real, this proves it. If it isn't, better to know now.</p>
+      <div class="btns">
+        <a class="btn primary" href="https://www.linkedin.com/in/cleiton-augusto-b619435b">Request a validation</a>
+        <a class="btn ghost" href="https://github.com/cleitonaugusto">See the tooling</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="sign">Cleiton Augusto Corr&ecirc;a Bezerra ·
+    <a href="https://github.com/cleitonaugusto">github.com/cleitonaugusto</a></p>
+</main>
+</body>
+</html>
