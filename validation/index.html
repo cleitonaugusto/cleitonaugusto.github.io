@@ -289,6 +289,43 @@
 
   <hr class="rule">
 
+  <section>
+    <div class="wrap">
+      <p class="kicker">The same idea, in book form</p>
+      <h2>A test that cannot fail looks exactly like a test that passes.</h2>
+      <p>The validation gate above exists because I do not trust my own results until I have
+      tried to break them. That habit came from somewhere else, and I wrote a book about it.</p>
+
+      <p><b><a href="https://www.amazon.com/dp/B0HHNQZBD3">Quantum Computing for Rust
+      Developers</a></b> — 2nd edition, September 2026. Paperback, 248 pages,
+      ISBN&nbsp;9798171107352. It builds a differential fuzzer from nothing, in Rust, and then
+      turns it on real compilers.</p>
+
+      <p>The evidence, all of it public and checkable:</p>
+      <ul>
+        <li>The fuzzer found a soundness bug in <b>Qiskit's transpiler</b>: a three-gate sequence
+        equal to an <code>X</code> was cancelled to an empty circuit at optimisation level 2 and
+        above, silently changing measured results. Confirmed by a core maintainer, fixed in 2.5.1 —
+        <a href="https://github.com/Qiskit/qiskit/issues/16594">issue&nbsp;#16594</a>.</li>
+
+        <li>The second edition documents <b>nine errors found in the first</b>. The one worth
+        naming: I had written a demonstration to expose a sign bug, and the angles I chose were
+        the ones where that bug is invisible. The demonstration ran, produced tidy numbers, and
+        proved nothing.</li>
+
+        <li>The measurements behind it are published with a DOI —
+        <a href="https://doi.org/10.5281/zenodo.22239105">10.5281/zenodo.22239105</a> — including
+        a retraction of one of my own earlier figures, which turned out to be an artefact of how
+        I had counted rather than a result.</li>
+      </ul>
+
+      <p>That last point is why the book and the gate belong on the same page. Both are built on
+      one rule: <b>an instrument earns trust only after you have seen it fail on purpose.</b></p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
   <section class="cta">
     <div class="wrap">
       <h2>Is your model real?</h2>
